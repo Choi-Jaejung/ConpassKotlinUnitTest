@@ -5,14 +5,13 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.conpassunittest1.data.Income
-import com.example.conpassunittest1.repo.ApiService
 import com.example.conpassunittest1.repo.GetIncomeRepositoryImpl
-import com.example.conpassunittest1.repo.RetrofitClient
 import com.example.conpassunittest1.usecase.GetIncomeUsecaseImpl
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class DemoViewModel(
-    private val apiService: ApiService,
     private val incomeRepository: GetIncomeRepositoryImpl
 ) : ViewModel() {
 
@@ -52,11 +51,11 @@ class DemoViewModel(
         }
     }
 
-    fun calculateIncomeTaxByRepo(name: String):Double {
-        getIncome(name = name)
+    suspend fun calculateIncomeTaxByRepo(name: String): Double {
+        withContext(Dispatchers.Main) {
+            getIncome(name)
+        }
 
-        val taxResult = calculateIncomeTax(income = income.value.income)
-
-        return taxResult
+        return calculateIncomeTax(income.value.income)
     }
 }

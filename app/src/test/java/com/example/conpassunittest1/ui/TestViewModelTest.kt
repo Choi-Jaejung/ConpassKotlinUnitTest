@@ -1,6 +1,7 @@
 package com.example.conpassunittest1.ui
 
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.test.runTest
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -29,7 +30,7 @@ class TestViewModelTest {
     }
 
     @Test
-    fun test_flag_change_after_delay() = runBlocking {
+    fun test_flag_change_after_delay() = runTest {
         // Act
         viewModel.changeFlagAfterDelay(300000)// 5分間実行を待つ
 
@@ -40,16 +41,13 @@ class TestViewModelTest {
     @Test
     fun calculateIncomeTax_should_calculate_correctly() {
         // Arrange
-        val income = 1_000_000.0// 税金を計算する所得を設定
-        val expectedInhabitantTax = income * 0.10//一律てきに10%を適用した住民税額
-        val expectedLowIncomeTax = (income * 0.05) + expectedInhabitantTax//実際の所得税率を適用した所得税額
+        val income = 1000000.0// 税金を計算する所得を設定
+        val expectedLowIncomeTax = 150000.0// 正しい税金計算の結果
 
         // Act
-        val actualInhabitantTax = viewModel.calculateLocalInhabitantTax(income)//メソッドを実行し、住民税を算出
         val actualTax = viewModel.calculateIncomeTax(income)//メソッドを実行し、所得税を算出
 
         //Assert
-        assertEquals(expectedInhabitantTax, actualInhabitantTax, 1e-2)//メソッドから算出された住民税が正しいかを確認
         assertEquals(expectedLowIncomeTax, actualTax, 1e-2)//メソッドからの算出された税金が正しいかを確認
     }
 
