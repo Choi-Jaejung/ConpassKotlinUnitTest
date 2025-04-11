@@ -82,6 +82,7 @@ class DemoViewModelTest {
         val tax = viewModel.calculateIncomeTaxByRepo("TestName")
         advanceUntilIdle()
         // コールティンが終わるまで実行
+        // TODO:コルーチンの処理が終わるまで待機：DemoViewModelでは、Coroutineと書かれていたが？
 
         //Assert　第一引数：expected, 第二引数：actual
         val expectedTax = viewModel.calculateIncomeTax(expectedIncome)
