@@ -5,7 +5,7 @@ import com.example.conpassunittest1.repo.GetIncomeRepositoryImpl
 
 class GetIncomeUsecaseImpl(private val incomeRepository: GetIncomeRepositoryImpl) {
 
-    suspend fun execute(name: String): Result<Income> {
+    suspend fun execute(name: String): Result<Double> {
         return try {
             val income = incomeRepository.fetchIncome(name)
             Result.success(income)

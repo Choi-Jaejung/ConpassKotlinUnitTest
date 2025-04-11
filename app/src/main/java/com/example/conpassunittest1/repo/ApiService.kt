@@ -6,5 +6,5 @@ import retrofit2.http.Path
 
 interface ApiService {
     @GET("income/{name}")
-    suspend fun getIncome(@Path("name") name: String): Income
+    suspend fun getIncome(@Path("name") name: String): Double
 }

@@ -1,10 +1,9 @@
 package com.example.conpassunittest1.ui
 
 import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.mutableDoubleStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.conpassunittest1.data.Income
 import com.example.conpassunittest1.repo.GetIncomeRepositoryImpl
 import com.example.conpassunittest1.usecase.GetIncomeUsecaseImpl
 import kotlinx.coroutines.Dispatchers
@@ -12,11 +11,15 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 class DemoViewModel(
-    private val incomeRepository: GetIncomeRepositoryImpl
+    private val incomeRepository: GetIncomeRepositoryImpl // viewModelのクラス中でAPI連携を呼び出すために必要
 ) : ViewModel() {
 
-    val income: MutableState<Income> = mutableStateOf(Income(name = "", income = 0.0))
+    var income: MutableState<Double> = mutableDoubleStateOf(0.0)
 
+    /**
+     * 所得税を算出するメソッド
+     * incomeを引数として貰い、incomeの額により違う税金率を適用する
+     * */
     fun calculateIncomeTax(income: Double): Double { //所得税
         val nationalIncomeTax = when { // 所得別に違う税金率を掛ける
             income <= 1950000 -> income * 0.05
@@ -25,37 +28,48 @@ class DemoViewModel(
             income <= 9000000 -> 962500 + (income - 6950000) * 0.23
             income <= 18000000 -> 1434000 + (income - 9000000) * 0.33
             income <= 40000000 -> 4404000 + (income - 18000000) * 0.40
-            else -> 13204000 + (income - 40000000) * 0.45
+            else -> 13204000 + (income - 40000000) * 0.45//4000000を超える所得の場合はこっちに入る
         }
 
         val inhabitantTax = calculateLocalInhabitantTax(income = income) // 住民税を算出する
 
-        return (nationalIncomeTax + inhabitantTax)
+        return (nationalIncomeTax + inhabitantTax)// 住民税と所得税を合算して返す
     }
 
+    /**
+     * 住民税を計算するメソッド
+     * 固定値で引数*0.10の計算値を返す
+     * */
     fun calculateLocalInhabitantTax(income: Double): Double { //住民税
         return income * 0.10 //住民税は一律的に適用
     }
 
+    /**
+     * APIから値を貰うメソッド
+     * nameをキーとして該当するIncome(Double)の値を貰う。
+     * */
     fun getIncome(name: String) {
         val getIncomeUseCase = GetIncomeUsecaseImpl(incomeRepository)
 
-        viewModelScope.launch {
+        viewModelScope.launch {// Coroutineを使って外部と連携をする処理が行われる
             val result = getIncomeUseCase.execute(name)
             result.onSuccess { resultIncome ->
-                println("Name: ${resultIncome.name}, Income: ${resultIncome.income}")
+
                 income.value = resultIncome
             }.onFailure { ex ->
                 println("Error fetching income: ${ex.message}")
             }
-        }
+        }//モックすることで、単体テストの実装の際にはロジックの実行を気にしなくてもいい
     }
 
+    /**
+     * APIを呼び出すメソッドからIncomeを貰い、そのIncomeを引数として税金を算出するメソッドを呼ぶ
+     * */
     suspend fun calculateIncomeTaxByRepo(name: String): Double {
-        withContext(Dispatchers.Main) {
+        withContext(Dispatchers.Main) {// APIとの連携するメソッドを呼び出す
             getIncome(name)
         }
 
-        return calculateIncomeTax(income.value.income)
+        return calculateIncomeTax(income.value)// APIからもらった値を使い税金を算出する
     }
 }
