@@ -1,6 +1,5 @@
 package com.example.conpassunittest1.usecase
 
-import com.example.conpassunittest1.data.Income
 import com.example.conpassunittest1.repo.GetIncomeRepositoryImpl
 
 class GetIncomeUsecaseImpl(private val incomeRepository: GetIncomeRepositoryImpl) {
