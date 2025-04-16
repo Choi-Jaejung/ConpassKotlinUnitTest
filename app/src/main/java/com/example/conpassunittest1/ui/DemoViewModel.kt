@@ -73,7 +73,7 @@ class DemoViewModel(
      * @return 所得税と住民税の合算した税金額
      * */
     suspend fun calculateIncomeTaxByRepo(name: String): Double {
-        withContext(Dispatchers.Main) {// APIからデーターを貰う
+        withContext(Dispatchers.Main) {// APIからデータを貰う
             getIncome(name)
         }
 

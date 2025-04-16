@@ -21,6 +21,8 @@ class DemoViewModelTest {
     * テストケースで共通的に使われる値は、テストクラスで宣言することで、各々のテストメソッドの内部で重複して宣言する必要をなくす
     *
     * 宣言の際に初期化をしない値は、lateinitを付ける
+    *
+    * viewModelは毎テーストケース実行前に初期化することで、各々のテストが独立されていることを担保出来る。
     * */
     private lateinit var viewModel: DemoViewModel
     private val mockIncomeRepository: GetIncomeRepositoryImpl = mockk()
