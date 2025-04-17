@@ -90,6 +90,7 @@ class DemoViewModelTest {
         // Arrange
         val expectedIncome = 5000000.0
         viewModel.income = mockk()
+        val expectedTax = viewModel.calculateIncomeTax(expectedIncome)
 
         coEvery { mockIncomeRepository.fetchIncome("testName") } returns expectedIncome
         every { viewModel.income.value } returns expectedIncome
@@ -101,7 +102,6 @@ class DemoViewModelTest {
         // Coroutineの処理が終わるまで待機
 
         //Assert　第一引数：expected, 第二引数：actual
-        val expectedTax = viewModel.calculateIncomeTax(expectedIncome)
         assertEquals(expectedTax, tax)
     }
 }
