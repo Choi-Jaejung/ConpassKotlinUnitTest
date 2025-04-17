@@ -17,10 +17,23 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 
 class DemoViewModelTest {
+    /*
+    * テストケースで共通的に使われる値は、テストクラスで宣言することで、各々のテストメソッドの内部で重複して宣言する必要をなくす
+    *
+    * 宣言の際に初期化をしない値は、lateinitを付ける
+    *
+    * viewModelは毎テーストケース実行前に初期化することで、各々のテストが独立されていることを担保出来る。
+    * */
     private lateinit var viewModel: DemoViewModel
     private val mockIncomeRepository: GetIncomeRepositoryImpl = mockk()
     private val testDispatcher = StandardTestDispatcher()
 
+    /*
+    * @BeforeEach
+    * 各々の単体テストケースが実行される前に実行される。
+    *
+    * 例）テスト対象メソッドを格納しているクラスを初期化する
+    * */
     @OptIn(ExperimentalCoroutinesApi::class)
     @BeforeEach
     fun setup() {
@@ -28,9 +41,12 @@ class DemoViewModelTest {
         viewModel = DemoViewModel(mockIncomeRepository)
     }
 
-    /**
-     *
-     * */
+    /*
+    *@AfterEach
+    *各々の単体テストのケースが実行された後実行される
+    *
+    * 例）モック化した値をモックし直す、モックを解除する
+    * */
     @OptIn(ExperimentalCoroutinesApi::class)
     @AfterEach
     fun tearDown() {
@@ -67,6 +83,7 @@ class DemoViewModelTest {
         assertEquals(expectedTax, realTax, "calculated income tax is wrong")
     }
 
+
     @OptIn(ExperimentalCoroutinesApi::class)
     @Test
     fun test_calculateIncomeTaxByRepo_should_return_tax_for_given_name() = runTest {
@@ -76,12 +93,12 @@ class DemoViewModelTest {
 
         coEvery { mockIncomeRepository.fetchIncome("testName") } returns expectedIncome
         every { viewModel.income.value } returns expectedIncome
-        //実際の挙動とmockを使う理由を説明し、そのケースを説明する。テスト壊れる原因が複数なのはよくない
+        //テスト壊れる原因が複数なのはよくない。そのため、テストで確認する要因以外は仮の値を使う。
 
         // Act
         val tax = viewModel.calculateIncomeTaxByRepo("TestName")
         advanceUntilIdle()
-        // コールティンが終わるまで実行
+        // Coroutineの処理が終わるまで待機
 
         //Assert　第一引数：expected, 第二引数：actual
         val expectedTax = viewModel.calculateIncomeTax(expectedIncome)
